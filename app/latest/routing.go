@@ -44,10 +44,14 @@ func HandleSubrouter(s *mux.Router, confhandler *respond.ConfHandler) {
 }
 
 var appRoutesV2 = []respond.AppRoutes{
+	{Name: "latest.get.groups", Verb: "GET", Path: "/{report_name}/groups", SubrouterHandler: routeCheckGroup},
+	{Name: "latest.get.group", Verb: "GET", Path: "/{report_name}/groups/{group_name}", SubrouterHandler: routeCheckGroup},
 	{Name: "latest.get", Verb: "GET", Path: "/{report_name}/{group_type}/{group_name}", SubrouterHandler: routeCheckGroup},
 	{Name: "latest.get", Verb: "GET", Path: "/{report_name}/{group_type}", SubrouterHandler: routeCheckGroup},
 	{Name: "latest.options", Verb: "OPTIONS", Path: "/{report_name}/{group_name}/{endpoint_group}", SubrouterHandler: Options},
 	{Name: "latest.options", Verb: "OPTIONS", Path: "/{report_name}/{group_name}", SubrouterHandler: Options},
+	{Name: "latest.options", Verb: "OPTIONS", Path: "/{report_name}/groups/{endpoint_group}", SubrouterHandler: Options},
+	{Name: "latest.options", Verb: "OPTIONS", Path: "/{report_name}/groups", SubrouterHandler: Options},
 }
 
 func routeCheckGroup(r *http.Request, cfg config.Config) (int, http.Header, []byte, error) {
@@ -79,7 +83,7 @@ func routeCheckGroup(r *http.Request, cfg config.Config) (int, http.Header, []by
 		return code, h, output, err
 	}
 
-	if vars["group_type"] != result.GetEndpointGroupType() {
+	if vars["group_type"] != "" && vars["group_type"] != result.GetEndpointGroupType() {
 		code = http.StatusNotFound
 		message := "The report " + vars["report_name"] + " does not define endpoint group type: " + vars["group_type"]
 		output, err := createMessageOUT(message, code, contentType) //Render the response into XML or JSON

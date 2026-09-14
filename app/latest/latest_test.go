@@ -152,6 +152,16 @@ func (suite *LatestTestSuite) SetupTest() {
 			"resource": "latest.get",
 			"roles":    []string{"editor", "viewer"},
 		})
+	c.InsertOne(context.TODO(),
+		bson.M{
+			"resource": "latest.get.groups",
+			"roles":    []string{"editor", "viewer"},
+		})
+	c.InsertOne(context.TODO(),
+		bson.M{
+			"resource": "latest.get.group",
+			"roles":    []string{"editor", "viewer"},
+		})
 	// get dbconfiguration based on the tenant
 	// Prepare the request object
 	request, _ := http.NewRequest("GET", "", strings.NewReader(""))
@@ -779,6 +789,543 @@ func (suite *LatestTestSuite) TestListLatest() {
 		"?date=2015-05-01T00:00:00Z&strict=true&limit=2"
 
 	fullurl10 := "/api/v2/latest/Report_B/EUDAT_SITES/EL-01-AUTH" +
+		"?date=2015-05-01T00:00:00Z&filter=non-ok&strict=true"
+
+	// 1. EGI JSON REQUEST
+	// init the response placeholder
+	response := httptest.NewRecorder()
+	// Prepare the request object for second tenant
+	request, _ := http.NewRequest("GET", fullurl1, strings.NewReader(""))
+	// add json accept header
+	request.Header.Set("Accept", "application/json")
+	// add the authentication token which is seeded in testdb
+	request.Header.Set("x-api-key", "KEY1")
+	// Serve the http request
+	suite.router.ServeHTTP(response, request)
+	// Check that we must have a 200 ok code
+	suite.Equal(200, response.Code, "Internal Server Error")
+	// Compare the expected and actual xml response
+	suite.Equal(respJSON1, response.Body.String(), "Response body mismatch")
+
+	// 2. EUDAT JSON REQUEST
+	// init the response placeholder
+	response = httptest.NewRecorder()
+	// Prepare the request object for second tenant
+	request, _ = http.NewRequest("GET", fullurl2, strings.NewReader(""))
+	// add json accept header
+	request.Header.Set("Accept", "application/json")
+	// add the authentication token which is seeded in testdb
+	request.Header.Set("x-api-key", "KEY2")
+	// Serve the http request
+	suite.router.ServeHTTP(response, request)
+	// Check that we must have a 200 ok code
+	suite.Equal(200, response.Code, "Internal Server Error")
+	// Compare the expected and actual xml response
+	suite.Equal(respJSON2, response.Body.String(), "Response body mismatch")
+
+	// 3. EUDAT limit = 1
+	// init the response placeholder
+	response = httptest.NewRecorder()
+	// Prepare the request object for second tenant
+	request, _ = http.NewRequest("GET", fullurl3, strings.NewReader(""))
+	// add json accept header
+	request.Header.Set("Accept", "application/json")
+	// add the authentication token which is seeded in testdb
+	request.Header.Set("x-api-key", "KEY2")
+	// Serve the http request
+	suite.router.ServeHTTP(response, request)
+	// Check that we must have a 200 ok code
+	suite.Equal(200, response.Code, "Internal Server Error")
+	// Compare the expected and actual xml response
+	suite.Equal(respJSON3, response.Body.String(), "Response body mismatch")
+
+	// 4. EUDAT non-ok
+	// init the response placeholder
+	response = httptest.NewRecorder()
+	// Prepare the request object for second tenant
+	request, _ = http.NewRequest("GET", fullurl4, strings.NewReader(""))
+	// add json accept header
+	request.Header.Set("Accept", "application/json")
+	// add the authentication token which is seeded in testdb
+	request.Header.Set("x-api-key", "KEY2")
+	// Serve the http request
+	suite.router.ServeHTTP(response, request)
+	// Check that we must have a 200 ok code
+	suite.Equal(200, response.Code, "Internal Server Error")
+	// Compare the expected and actual xml response
+	suite.Equal(respJSON4, response.Body.String(), "Response body mismatch")
+
+	// 5. EUDAT non-ok
+	// init the response placeholder
+	response = httptest.NewRecorder()
+	// Prepare the request object for second tenant
+	request, _ = http.NewRequest("GET", fullurl5, strings.NewReader(""))
+	// add json accept header
+	request.Header.Set("Accept", "application/json")
+	// add the authentication token which is seeded in testdb
+	request.Header.Set("x-api-key", "KEY2")
+	// Serve the http request
+	suite.router.ServeHTTP(response, request)
+	// Check that we must have a 200 ok code
+	suite.Equal(200, response.Code, "Internal Server Error")
+	// Compare the expected and actual xml response
+	suite.Equal(respJSON5, response.Body.String(), "Response body mismatch")
+
+	// 6. EUDAT non-ok
+	// init the response placeholder
+	response = httptest.NewRecorder()
+	// Prepare the request object for second tenant
+	request, _ = http.NewRequest("GET", fullurl6, strings.NewReader(""))
+	// add json accept header
+	request.Header.Set("Accept", "application/json")
+	// add the authentication token which is seeded in testdb
+	request.Header.Set("x-api-key", "KEY2")
+	// Serve the http request
+	suite.router.ServeHTTP(response, request)
+	// Check that we must have a 200 ok code
+	suite.Equal(200, response.Code, "Internal Server Error")
+	// Compare the expected and actual xml response
+	suite.Equal(respJSON6, response.Body.String(), "Response body mismatch")
+
+	// 6b. WRONG KEY REQUEST
+	// init the response placeholder
+	response = httptest.NewRecorder()
+	// Prepare the request object for second tenant
+	request, _ = http.NewRequest("GET", fullurl2, strings.NewReader(""))
+	// add json accept header
+	request.Header.Set("Accept", "application/json")
+	// add the authentication token which is seeded in testdb
+	request.Header.Set("x-api-key", "KEYISWRONG")
+	// Serve the http request
+	suite.router.ServeHTTP(response, request)
+	// Check that we must have a 200 ok code
+	suite.Equal(401, response.Code, "Response code mismatch")
+	// Compare the expected and actual xml response
+	suite.Equal(respUnauthorized, response.Body.String(), "Response body mismatch")
+
+	// 7. EGI JSON REQUEST - strict mode
+	// init the response placeholder
+	response = httptest.NewRecorder()
+	// Prepare the request object for second tenant
+	request, _ = http.NewRequest("GET", fullurl7, strings.NewReader(""))
+	// add json accept header
+	request.Header.Set("Accept", "application/json")
+	// add the authentication token which is seeded in testdb
+	request.Header.Set("x-api-key", "KEY1")
+	// Serve the http request
+	suite.router.ServeHTTP(response, request)
+	// Check that we must have a 200 ok code
+	suite.Equal(200, response.Code, "Internal Server Error")
+	// Compare the expected and actual xml response
+	suite.Equal(respJSON7, response.Body.String(), "Response body mismatch")
+
+	// 8. EGI JSON REQUEST - strict mode - all sites
+	// init the response placeholder
+	response = httptest.NewRecorder()
+	// Prepare the request object for second tenant
+	request, _ = http.NewRequest("GET", fullurl8, strings.NewReader(""))
+	// add json accept header
+	request.Header.Set("Accept", "application/json")
+	// add the authentication token which is seeded in testdb
+	request.Header.Set("x-api-key", "KEY1")
+	// Serve the http request
+	suite.router.ServeHTTP(response, request)
+	// Check that we must have a 200 ok code
+	suite.Equal(200, response.Code, "Internal Server Error")
+	// Compare the expected and actual xml response
+	suite.Equal(respJSON8, response.Body.String(), "Response body mismatch")
+
+	// 9. EGI JSON REQUEST - strict mode - all sites but with limit (strict honors limits)
+	// init the response placeholder
+	response = httptest.NewRecorder()
+	// Prepare the request object for second tenant
+	request, _ = http.NewRequest("GET", fullurl9, strings.NewReader(""))
+	// add json accept header
+	request.Header.Set("Accept", "application/json")
+	// add the authentication token which is seeded in testdb
+	request.Header.Set("x-api-key", "KEY1")
+	// Serve the http request
+	suite.router.ServeHTTP(response, request)
+	// Check that we must have a 200 ok code
+	suite.Equal(200, response.Code, "Internal Server Error")
+	// Compare the expected and actual xml response
+	suite.Equal(respJSON9, response.Body.String(), "Response body mismatch")
+
+	// 10. EGI JSON REQUEST - strict mode - honor non-ok values only
+	// init the response placeholder
+	response = httptest.NewRecorder()
+	// Prepare the request object for second tenant
+	request, _ = http.NewRequest("GET", fullurl10, strings.NewReader(""))
+	// add json accept header
+	request.Header.Set("Accept", "application/json")
+	// add the authentication token which is seeded in testdb
+	request.Header.Set("x-api-key", "KEY2")
+	// Serve the http request
+	suite.router.ServeHTTP(response, request)
+	// Check that we must have a 200 ok code
+	suite.Equal(200, response.Code, "Internal Server Error")
+	// Compare the expected and actual xml response
+	suite.Equal(respJSON10, response.Body.String(), "Response body mismatch")
+
+}
+
+func (suite *LatestTestSuite) TestListLatestNoGroupType() {
+
+	respJSON1 := `{
+ "status": {
+  "message": "application/json",
+  "code": "200"
+ },
+ "data": {
+  "metric_data": [
+   {
+    "endpoint_group": "HG-03-AUTH",
+    "service": "CREAM-CE",
+    "endpoint": "cream01.afroditi.gr",
+    "metric": "emi.cream.CREAMCE-JobSubmit",
+    "timestamp": "2015-05-01T05:00:00Z",
+    "status": "OK",
+    "summary": "Cream status is ok",
+    "message": "Cream job submission test return value of ok"
+   },
+   {
+    "endpoint_group": "HG-03-AUTH",
+    "service": "CREAM-CE",
+    "endpoint": "cream01.afroditi.gr",
+    "metric": "emi.cream.CREAMCE-JobSubmit",
+    "timestamp": "2015-05-01T01:00:00Z",
+    "status": "CRITICAL",
+    "summary": "Cream status is CRITICAL",
+    "message": "Cream job submission test failed"
+   },
+   {
+    "endpoint_group": "HG-03-AUTH",
+    "service": "CREAM-CE",
+    "endpoint": "cream01.afroditi.gr",
+    "metric": "emi.cream.CREAMCE-JobSubmit",
+    "timestamp": "2015-05-01T00:00:00Z",
+    "status": "OK",
+    "summary": "Cream status is ok",
+    "message": "Cream job submission test return value of ok"
+   }
+  ]
+ }
+}`
+	respJSON2 := `{
+ "status": {
+  "message": "application/json",
+  "code": "200"
+ },
+ "data": {
+  "metric_data": [
+   {
+    "endpoint_group": "EL-01-AUTH",
+    "service": "someService",
+    "endpoint": "someservice.example.gr",
+    "metric": "someService-FileTransfer",
+    "timestamp": "2015-05-01T05:00:00Z",
+    "status": "WARNING",
+    "summary": "someService status is ok",
+    "message": "someService data upload test return value of ok"
+   },
+   {
+    "endpoint_group": "EL-01-AUTH",
+    "service": "someService",
+    "endpoint": "someservice.example.gr",
+    "metric": "someService-FileTransfer",
+    "timestamp": "2015-05-01T05:00:00Z",
+    "status": "MISSING",
+    "summary": "someService status is ok",
+    "message": "someService data upload test return value of ok"
+   },
+   {
+    "endpoint_group": "EL-01-AUTH",
+    "service": "someService",
+    "endpoint": "someservice.example.gr",
+    "metric": "someService-FileTransfer",
+    "timestamp": "2015-05-01T05:00:00Z",
+    "status": "CRITICAL",
+    "summary": "someService status is ok",
+    "message": "someService data upload test return value of ok"
+   },
+   {
+    "endpoint_group": "EL-01-AUTH",
+    "service": "someService",
+    "endpoint": "someservice.example.gr",
+    "metric": "someService-FileTransfer",
+    "timestamp": "2015-05-01T01:00:00Z",
+    "status": "UNKNOWN",
+    "summary": "someService status is CRITICAL",
+    "message": "someService data upload test failed"
+   },
+   {
+    "endpoint_group": "EL-01-AUTH",
+    "service": "someService",
+    "endpoint": "someservice.example.gr",
+    "metric": "someService-FileTransfer",
+    "timestamp": "2015-05-01T00:00:00Z",
+    "status": "OK",
+    "summary": "someService status is ok",
+    "message": "someService data upload test return value of ok"
+   }
+  ]
+ }
+}`
+
+	respJSON3 := `{
+ "status": {
+  "message": "application/json",
+  "code": "200"
+ },
+ "data": {
+  "metric_data": [
+   {
+    "endpoint_group": "EL-01-AUTH",
+    "service": "someService",
+    "endpoint": "someservice.example.gr",
+    "metric": "someService-FileTransfer",
+    "timestamp": "2015-05-01T05:00:00Z",
+    "status": "WARNING",
+    "summary": "someService status is ok",
+    "message": "someService data upload test return value of ok"
+   }
+  ]
+ }
+}`
+
+	respJSON4 := `{
+ "status": {
+  "message": "application/json",
+  "code": "200"
+ },
+ "data": {
+  "metric_data": [
+   {
+    "endpoint_group": "EL-01-AUTH",
+    "service": "someService",
+    "endpoint": "someservice.example.gr",
+    "metric": "someService-FileTransfer",
+    "timestamp": "2015-05-01T05:00:00Z",
+    "status": "WARNING",
+    "summary": "someService status is ok",
+    "message": "someService data upload test return value of ok"
+   },
+   {
+    "endpoint_group": "EL-01-AUTH",
+    "service": "someService",
+    "endpoint": "someservice.example.gr",
+    "metric": "someService-FileTransfer",
+    "timestamp": "2015-05-01T05:00:00Z",
+    "status": "MISSING",
+    "summary": "someService status is ok",
+    "message": "someService data upload test return value of ok"
+   },
+   {
+    "endpoint_group": "EL-01-AUTH",
+    "service": "someService",
+    "endpoint": "someservice.example.gr",
+    "metric": "someService-FileTransfer",
+    "timestamp": "2015-05-01T05:00:00Z",
+    "status": "CRITICAL",
+    "summary": "someService status is ok",
+    "message": "someService data upload test return value of ok"
+   },
+   {
+    "endpoint_group": "EL-01-AUTH",
+    "service": "someService",
+    "endpoint": "someservice.example.gr",
+    "metric": "someService-FileTransfer",
+    "timestamp": "2015-05-01T01:00:00Z",
+    "status": "UNKNOWN",
+    "summary": "someService status is CRITICAL",
+    "message": "someService data upload test failed"
+   }
+  ]
+ }
+}`
+
+	respJSON5 := `{
+ "status": {
+  "message": "application/json",
+  "code": "200"
+ },
+ "data": {
+  "metric_data": [
+   {
+    "endpoint_group": "EL-01-AUTH",
+    "service": "someService",
+    "endpoint": "someservice.example.gr",
+    "metric": "someService-FileTransfer",
+    "timestamp": "2015-05-01T05:00:00Z",
+    "status": "CRITICAL",
+    "summary": "someService status is ok",
+    "message": "someService data upload test return value of ok"
+   }
+  ]
+ }
+}`
+
+	respJSON6 := `{
+ "status": {
+  "message": "application/json",
+  "code": "200"
+ },
+ "data": {
+  "metric_data": [
+   {
+    "endpoint_group": "EL-01-AUTH",
+    "service": "someService",
+    "endpoint": "someservice.example.gr",
+    "metric": "someService-FileTransfer",
+    "timestamp": "2015-05-01T00:00:00Z",
+    "status": "OK",
+    "summary": "someService status is ok",
+    "message": "someService data upload test return value of ok"
+   }
+  ]
+ }
+}`
+
+	respJSON7 := `{
+ "status": {
+  "message": "application/json",
+  "code": "200"
+ },
+ "data": {
+  "metric_data": [
+   {
+    "endpoint_group": "HG-03-AUTH",
+    "service": "CREAM-CE",
+    "endpoint": "cream01.afroditi.gr",
+    "metric": "emi.cream.CREAMCE-JobSubmit",
+    "timestamp": "2015-05-01T05:00:00Z",
+    "status": "OK",
+    "summary": "Cream status is ok",
+    "message": "Cream job submission test return value of ok"
+   }
+  ]
+ }
+}`
+
+	respJSON8 := `{
+ "status": {
+  "message": "application/json",
+  "code": "200"
+ },
+ "data": {
+  "metric_data": [
+   {
+    "endpoint_group": "EL-01-AUTH",
+    "service": "someService-A",
+    "endpoint": "someservice.example.gr",
+    "metric": "someService-FileTransfer",
+    "timestamp": "2015-05-01T23:20:00Z",
+    "status": "OK",
+    "summary": "someService status is ok",
+    "message": "someService data upload test return value of ok"
+   },
+   {
+    "endpoint_group": "HG-03-AUTH",
+    "service": "CREAM-CE",
+    "endpoint": "cream01.afroditi.gr",
+    "metric": "emi.cream.CREAMCE-JobSubmit",
+    "timestamp": "2015-05-01T05:00:00Z",
+    "status": "OK",
+    "summary": "Cream status is ok",
+    "message": "Cream job submission test return value of ok"
+   }
+  ]
+ }
+}`
+
+	respJSON9 := `{
+ "status": {
+  "message": "application/json",
+  "code": "200"
+ },
+ "data": {
+  "metric_data": [
+   {
+    "endpoint_group": "EL-01-AUTH",
+    "service": "someService-A",
+    "endpoint": "someservice.example.gr",
+    "metric": "someService-FileTransfer",
+    "timestamp": "2015-05-01T23:20:00Z",
+    "status": "OK",
+    "summary": "someService status is ok",
+    "message": "someService data upload test return value of ok"
+   },
+   {
+    "endpoint_group": "HG-03-AUTH",
+    "service": "CREAM-CE",
+    "endpoint": "cream01.afroditi.gr",
+    "metric": "emi.cream.CREAMCE-JobSubmit",
+    "timestamp": "2015-05-01T05:00:00Z",
+    "status": "OK",
+    "summary": "Cream status is ok",
+    "message": "Cream job submission test return value of ok"
+   }
+  ]
+ }
+}`
+
+	respJSON10 := `{
+ "status": {
+  "message": "application/json",
+  "code": "200"
+ },
+ "data": {
+  "metric_data": [
+   {
+    "endpoint_group": "EL-01-AUTH",
+    "service": "someService",
+    "endpoint": "someservice.example.gr",
+    "metric": "someService-FileTransfer",
+    "timestamp": "2015-05-01T05:00:00Z",
+    "status": "WARNING",
+    "summary": "someService status is ok",
+    "message": "someService data upload test return value of ok"
+   }
+  ]
+ }
+}`
+
+	respUnauthorized := `{
+ "status": {
+  "message": "Unauthorized",
+  "code": "401",
+  "details": "You need to provide a correct authentication token using the header 'x-api-key'"
+ }
+}`
+
+	fullurl1 := "/api/v2/latest/Report_A/groups/HG-03-AUTH" +
+		"?date=2015-05-01T00:00:00Z&strict=false"
+
+	fullurl2 := "/api/v2/latest/Report_B/groups/EL-01-AUTH" +
+		"?date=2015-05-01T00:00:00Z&strict=false"
+
+	fullurl3 := "/api/v2/latest/Report_B/groups/EL-01-AUTH" +
+		"?date=2015-05-01T00:00:00Z&limit=1&strict=false"
+
+	fullurl4 := "/api/v2/latest/Report_B/groups/EL-01-AUTH" +
+		"?date=2015-05-01T00:00:00Z&filter=non-ok"
+
+	fullurl5 := "/api/v2/latest/Report_B/groups/EL-01-AUTH" +
+		"?date=2015-05-01T00:00:00Z&filter=critical"
+
+	fullurl6 := "/api/v2/latest/Report_B/groups/EL-01-AUTH" +
+		"?date=2015-05-01T00:00:00Z&filter=ok"
+
+	fullurl7 := "/api/v2/latest/Report_A/groups/HG-03-AUTH" +
+		"?date=2015-05-01T00:00:00Z&strict=true"
+
+	fullurl8 := "/api/v2/latest/Report_A/groups" +
+		"?date=2015-05-01T00:00:00Z&strict=true"
+
+	fullurl9 := "/api/v2/latest/Report_A/groups" +
+		"?date=2015-05-01T00:00:00Z&strict=true&limit=2"
+
+	fullurl10 := "/api/v2/latest/Report_B/groups/EL-01-AUTH" +
 		"?date=2015-05-01T00:00:00Z&filter=non-ok&strict=true"
 
 	// 1. EGI JSON REQUEST
