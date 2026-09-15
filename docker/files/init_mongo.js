@@ -402,6 +402,14 @@ db.roles.insertMany([
     roles: ['admin', 'editor', 'viewer', 'admin_ui']
   },
   {
+    resource: 'latest.get.groups',
+    roles: ['admin', 'editor', 'viewer', 'admin_ui']
+  },
+  {
+    resource: 'latest.get.group',
+    roles: ['admin', 'editor', 'viewer', 'admin_ui']
+  },
+  {
     resource: 'topology.list',
     roles: ['admin', 'editor', 'viewer', 'admin_ui']
   },

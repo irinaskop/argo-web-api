@@ -31,6 +31,14 @@ function populate_default_roles() {
             roles: ["admin", "editor", "viewer", "admin_ui"]
         },
         {
+            resource: "latest.get.groups",
+            roles: ["admin", "editor", "viewer", "admin_ui"]
+        },
+        {
+            resource: "latest.get.group",
+            roles: ["admin", "editor", "viewer", "admin_ui"]
+        },
+        {
             resource: "reports.get",
             roles: ["admin", "editor", "viewer", "admin_ui"]
         },

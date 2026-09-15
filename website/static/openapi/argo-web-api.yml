@@ -4494,7 +4494,7 @@ paths:
       description: This request lists the latest metric data available for a specific
         endpoint group and supports filtering by status value. If user uses filter=non-ok
         will get all non ok statuses
-      operationId: statusLatestListGroup
+      operationId: statusLatestListGroupsNoType
       parameters:
       - name: x-api-key
         in: header
@@ -4517,6 +4517,198 @@ paths:
         schema:
           type: string
           default: EndpointGroup
+      - name: lgroup_name
+        in: path
+        description: endpoint group names of the probes
+        required: true
+        schema:
+          type: string
+          default: Group_A
+      - name: date
+        in: query
+        description: target day to get latest metric data
+        schema:
+          type: string
+          default: todays_date_zulu_format
+      - name: filter
+        in: query
+        description: 'filter by statuses: ok, non-ok, critical, warning, ok, unknown,
+          missing, all'
+        schema:
+          type: string
+          default: all
+      - name: limit
+        in: query
+        description: limit latest results by number
+        schema:
+          type: string
+          default: "500"
+      - name: strict
+        in: query
+        description: the servce will return only the latest entry grouped by endpoint_group/host/service/metric
+        schema:
+          type: string
+          default: "false"
+      responses:
+        "200":
+          description: Successful retrieval of latest metric data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricDataList'
+        "400":
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status_error'
+        "401":
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    type: string
+        "406":
+          description: Content Not acceptable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status_error'
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status_error'
+        "500":
+          description: internal server error
+          content:
+            application/json:
+              schema:
+                type: string
+  /latest/{report_name}/groups:
+    get:
+      tags:
+      - Latest
+      summary: List latest metric data for available in a specific report
+      description: This request lists the latest metric data  and supports filtering
+        by status value. If user uses filter=non-ok will get all non ok statuses
+      operationId: statusLatestListGroup
+      parameters:
+      - name: x-api-key
+        in: header
+        description: the x-api-key
+        required: true
+        schema:
+          type: string
+          default: SecretKey123
+      - name: report_name
+        in: path
+        description: report the probes belong to
+        required: true
+        schema:
+          type: string
+          default: CRITICAL
+      - name: date
+        in: query
+        description: target day to get latest metric data
+        schema:
+          type: string
+          default: todays_date_zulu_format
+      - name: filter
+        in: query
+        description: 'filter by statuses: ok, non-ok, critical, warning, ok, unknown,
+          missing, all'
+        schema:
+          type: string
+          default: all
+      - name: limit
+        in: query
+        description: limit latest results by number
+        schema:
+          type: string
+          default: "500"
+      - name: strict
+        in: query
+        description: the servce will return only the latest entry grouped by endpoint_group/host/service/metric
+        schema:
+          type: string
+          default: "false"
+      responses:
+        "200":
+          description: Successful retrieval of latest metric data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricDataList'
+        "400":
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status_error'
+        "401":
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    type: string
+        "406":
+          description: Content Not acceptable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status_error'
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status_error'
+        "500":
+          description: internal server error
+          content:
+            application/json:
+              schema:
+                type: string
+  /v2/latest/{report_name}/groups/{lgroup_name}:
+    get:
+      tags:
+      - Latest
+      summary: List latest metric data for a target endpoint group and filter by status
+      description: This request lists the latest metric data available for a specific
+        endpoint group and supports filtering by status value. If user uses filter=non-ok
+        will get all non ok statuses
+      operationId: statusLatestListGroupNoType
+      parameters:
+      - name: x-api-key
+        in: header
+        description: the x-api-key
+        required: true
+        schema:
+          type: string
+          default: SecretKey123
+      - name: report_name
+        in: path
+        description: report the probes belong to
+        required: true
+        schema:
+          type: string
+          default: CRITICAL
       - name: lgroup_name
         in: path
         description: endpoint group names of the probes
